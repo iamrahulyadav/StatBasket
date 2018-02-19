@@ -39,11 +39,11 @@ public class DbHelper extends SQLiteOpenHelper
         onCreate(db);
     }
 
-    public boolean insertData(String team_name)
+    public boolean insertData(String name)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COL_2, team_name);
+        contentValues.put(COL_2, name);
         long result = db.insert(TABLE_NAME, null, contentValues);
         if (result == -1)
             return false;
@@ -56,5 +56,15 @@ public class DbHelper extends SQLiteOpenHelper
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor result = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
         return result;
+    }
+
+    public boolean updateData(String id, String name)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_1, id);
+        contentValues.put(COL_2, name);
+        db.update(TABLE_NAME, contentValues, "team_id = ?", new String[] { id });
+        return true;
     }
 }

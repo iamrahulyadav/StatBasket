@@ -22,23 +22,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 {
     DbHelper myDatabase;
     Bundle bundle = new Bundle();
+    List<String> teams;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         myDatabase = new DbHelper(this);
-        final List<String> teams = getAllTeams();
-//        Bundle bundle = getIntent().getExtras();
-//        List<String> teams = new ArrayList<>(50);
-//        if (getCallingActivity() != null) {
-////            if (getCallingActivity().getClassName() == "com.example.justi_000.statbasket.ViewTeamActivity") {
-//                teams = bundle.getStringArrayList("teams");
-////            }
-//        }
+//        teams = getAllTeams();
+////        Bundle bundle = getIntent().getExtras();
+////        List<String> teams = new ArrayList<>(50);
+////        if (getCallingActivity() != null) {
+//////            if (getCallingActivity().getClassName() == "com.example.justi_000.statbasket.ViewTeamActivity") {
+////                teams = bundle.getStringArrayList("teams");
+//////            }
+////        }
+//
+////        final String[] teamArray = new String[] {"Lorem","Ipsum","dolor","sit","amet"};
+//
+//        ListView teamList = findViewById(R.id.lv_team_list);
+//        teamList.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, teams));
+//
+//        teamList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+//        {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+//            {
+//                Intent i = new Intent(MainActivity.this, ViewTeamActivity.class);
+//                bundle.putString("team", teams.get(position));
+//                i.putExtras(bundle);
+//                startActivity(i);
+//            }
+//        });
 
-//        final String[] teamArray = new String[] {"Lorem","Ipsum","dolor","sit","amet"};
+        getAllTeams();
+    }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        teams = getAllTeams();
 
         ListView teamList = findViewById(R.id.lv_team_list);
         teamList.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, teams));
@@ -51,12 +78,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             {
                 Intent i = new Intent(MainActivity.this, ViewTeamActivity.class);
                 bundle.putString("team", teams.get(position));
+                //needs fixed to get id based on team name in case of deletion and order is not maintained
+                bundle.putInt("id", position + 1);
                 i.putExtras(bundle);
                 startActivity(i);
             }
         });
-
-        getAllTeams();
     }
 
     @Override

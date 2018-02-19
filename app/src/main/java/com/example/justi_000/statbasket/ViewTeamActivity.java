@@ -20,9 +20,10 @@ public class ViewTeamActivity extends AppCompatActivity implements View.OnClickL
 {
     DbHelper myDatabase;
     EditText editTeamName;
+    EditText editId;
     Button btnAddData;
     Button btnViewData;
-    Button btnSaveData;
+    Button btnUpdateData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -33,16 +34,21 @@ public class ViewTeamActivity extends AppCompatActivity implements View.OnClickL
         myDatabase = new DbHelper(this);
 
         editTeamName = findViewById(R.id.edit_team_name);
+        editId = findViewById(R.id.edit_id);
+
         btnAddData = findViewById(R.id.btn_add_data);
         btnViewData = findViewById(R.id.btn_view_data);
-        btnSaveData = findViewById(R.id.btn_save_data);
+        btnUpdateData = findViewById(R.id.btn_update);
 
         Bundle bundle = getIntent().getExtras();
         String teamName = bundle.getString("team");
+        String team_id = String.valueOf(bundle.getInt("id"));
         editTeamName.setText(teamName);
+        editId.setText(team_id);
 
         addData();
         viewAllTeams();
+        updateData();
 //        returnToTeams();
     }
 
@@ -94,6 +100,23 @@ public class ViewTeamActivity extends AppCompatActivity implements View.OnClickL
                         showMessage("Data", buffer.toString());
                     }
                 }
+        );
+    }
+
+    public void updateData()
+    {
+        btnUpdateData.setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v)
+                {
+                    boolean isUpdated = myDatabase.updateData(editId.getText().toString(), editTeamName.getText().toString());
+                    if (isUpdated == true)
+                        Toast.makeText(ViewTeamActivity.this, "Data Updated", Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(ViewTeamActivity.this, "Data Not Updated", Toast.LENGTH_LONG).show();
+                }
+            }
         );
     }
 
