@@ -1,5 +1,6 @@
 package com.example.justi_000.statbasket;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +23,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 {
     DbHelper myDatabase;
     Bundle bundle = new Bundle();
-    List<String> teams;
+    ListView lvTeamList;
+    List<Team> teams;
+    List<String> team_names;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -58,28 +61,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            }
 //        });
 
-        getAllTeams();
+        //getAllTeams();
     }
 
     @Override
     protected void onStart()
     {
+//        super.onStart();
+//        teams = getAllTeams();
+//
+//        ListView teamList = findViewById(R.id.lv_team_list);
+//        teamList.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, teams));
+//
+//        teamList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+//        {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+//            {
+//                Intent i = new Intent(MainActivity.this, ViewTeamActivity.class);
+//                bundle.putString("team", teams.get(position));
+//                //needs fixed to get id based on team name in case of deletion and order is not maintained
+//                bundle.putInt("id", position + 1);
+//                i.putExtras(bundle);
+//                startActivity(i);
+//            }
+//        });
         super.onStart();
-        teams = getAllTeams();
+        teams = myDatabase.getAllTeams();
+        team_names = new ArrayList<>();
+        for(Team team : teams)
+        {
+            team_names.add(team.getName());
+        }
 
-        ListView teamList = findViewById(R.id.lv_team_list);
-        teamList.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, teams));
+        lvTeamList = findViewById(R.id.lv_team_list);
+        lvTeamList.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, team_names));
 
-        teamList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        lvTeamList.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                Intent i = new Intent(MainActivity.this, ViewTeamActivity.class);
-                bundle.putString("team", teams.get(position));
-                //needs fixed to get id based on team name in case of deletion and order is not maintained
-                bundle.putInt("id", position + 1);
+                Intent i = new Intent(MainActivity.this, EditTeamActivity.class);
+                bundle.putString("team", teams.get(position).getName());
+                bundle.putLong("id", teams.get(position).getId());
                 i.putExtras(bundle);
                 startActivity(i);
             }
@@ -106,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(this, MainActivity.class));
                 return true;
             case R.id.add_team:
-                Intent i = new Intent(MainActivity.this, ViewTeamActivity.class);
+                Intent i = new Intent(MainActivity.this, EditTeamActivity.class);
                 bundle.putString("team", "");
                 i.putExtras(bundle);
                 startActivity(i);
@@ -116,19 +143,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public ArrayList<String> getAllTeams()
-    {
-        Cursor result = myDatabase.getAllData();
-        if (result.getCount() == 0)
-        {
-            return new ArrayList<String>(50);
-        }
-
-        List<String> teamList = new ArrayList(50);
-        while (result.moveToNext())
-        {
-            teamList.add(result.getString(1));
-        }
-        return (ArrayList<String>) teamList;
-    }
+//    public ArrayList<String> getAllTeams()
+//    {
+//        Cursor result = myDatabase.getAllData();
+//        if (result.getCount() == 0)
+//        {
+//            return new ArrayList<String>(50);
+//        }
+//
+//        List<String> teamList = new ArrayList(50);
+//        while (result.moveToNext())
+//        {
+//            teamList.add(result.getString(1));
+//        }
+//        return (ArrayList<String>) teamList;
+//    }
 }
