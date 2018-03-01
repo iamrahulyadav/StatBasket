@@ -1,7 +1,6 @@
 package com.example.justi_000.statbasket;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,12 +13,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 
-public class EditTeamActivity extends AppCompatActivity implements View.OnClickListener
+public class ViewTeamActivity extends AppCompatActivity implements View.OnClickListener
 {
     DbHelper myDatabase;
     Bundle bundle = new Bundle();
@@ -35,7 +32,7 @@ public class EditTeamActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_team);
+        setContentView(R.layout.activity_view_team);
 
         myDatabase = new DbHelper(this);
 
@@ -97,12 +94,12 @@ public class EditTeamActivity extends AppCompatActivity implements View.OnClickL
                         {
                             long success = myDatabase.createTeam(team);
                             if (success > 0) {
-                                Toast.makeText(EditTeamActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
-                                Intent intent = new Intent(EditTeamActivity.this, MainActivity.class);
+                                Toast.makeText(ViewTeamActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
+                                Intent intent = new Intent(ViewTeamActivity.this, MainActivity.class);
                                 startActivity(intent);
                             }
                             else {
-                                Toast.makeText(EditTeamActivity.this, "Data Insertion Failed", Toast.LENGTH_LONG).show();
+                                Toast.makeText(ViewTeamActivity.this, "Data Insertion Failed", Toast.LENGTH_LONG).show();
                             }
                         }
                     }
@@ -174,10 +171,10 @@ public class EditTeamActivity extends AppCompatActivity implements View.OnClickL
                         team = myDatabase.getTeam(tvIdValue.getText().toString());
 //                        editTeamName.setText(team.getName());
 //                        editTeamName.setSelection(editTeamName.getText().length());
-                        Toast.makeText(EditTeamActivity.this, team.getName() + " Updated", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ViewTeamActivity.this, team.getName() + " Updated", Toast.LENGTH_LONG).show();
                     }
                     else {
-                        Toast.makeText(EditTeamActivity.this, "Update Failed", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ViewTeamActivity.this, "Update Failed", Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -194,10 +191,10 @@ public class EditTeamActivity extends AppCompatActivity implements View.OnClickL
                         Team team = myDatabase.getTeam(tvIdValue.getText().toString());
                         int isUpdated = myDatabase.deleteTeam(team.getId());
                         if (isUpdated == 1)
-                            Toast.makeText(EditTeamActivity.this, team.getName() + " Deleted", Toast.LENGTH_LONG).show();
+                            Toast.makeText(ViewTeamActivity.this, team.getName() + " Deleted", Toast.LENGTH_LONG).show();
                         else
-                            Toast.makeText(EditTeamActivity.this, "Deletion Failed", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(EditTeamActivity.this, MainActivity.class);
+                            Toast.makeText(ViewTeamActivity.this, "Deletion Failed", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(ViewTeamActivity.this, MainActivity.class);
                         startActivity(intent);
                     }
                 }
@@ -258,7 +255,7 @@ public class EditTeamActivity extends AppCompatActivity implements View.OnClickL
                 startActivity(new Intent(this, MainActivity.class));
                 return true;
             case R.id.add_team:
-                Intent i = new Intent(EditTeamActivity.this, MainActivity.class);
+                Intent i = new Intent(ViewTeamActivity.this, MainActivity.class);
                 bundle.putString("team", "");
                 i.putExtras(bundle);
                 startActivity(i);

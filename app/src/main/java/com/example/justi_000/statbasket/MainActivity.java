@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                Intent i = new Intent(MainActivity.this, EditTeamActivity.class);
+                Intent i = new Intent(MainActivity.this, ViewTeamActivity.class);
                 bundle.putString("team", teams.get(position).getName());
                 bundle.putLong("id", teams.get(position).getId());
                 i.putExtras(bundle);
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(this, MainActivity.class));
                 return true;
             case R.id.add_team:
-                Intent i = new Intent(MainActivity.this, EditTeamActivity.class);
+                Intent i = new Intent(MainActivity.this, ViewTeamActivity.class);
                 bundle.putString("team", "");
                 i.putExtras(bundle);
                 startActivity(i);
