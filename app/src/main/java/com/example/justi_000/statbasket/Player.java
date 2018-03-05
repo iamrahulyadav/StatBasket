@@ -3,7 +3,7 @@ package com.example.justi_000.statbasket;
 
 public class Player
 {
-    int player_id;
+    long player_id;
     String first_name;
     String last_name;
     int number;
@@ -12,7 +12,15 @@ public class Player
     String created_date;
 
     // constructors
-    public Player() {
+    public Player()
+    {
+        player_id = 0;
+        first_name = "";
+        last_name = "";
+        number = 0;
+        height_feet = 3;
+        height_inches = 0;
+        created_date = "";
     }
 
     public Player(String first_name, String last_name) {
@@ -20,7 +28,7 @@ public class Player
         this.last_name = last_name;
     }
 
-    public Player(int id, String first_name, String last_name, int number, int height_feet, int height_inches) {
+    public Player(long id, String first_name, String last_name, int number, int height_feet, int height_inches) {
         this.player_id = id;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -29,20 +37,28 @@ public class Player
         this.height_inches = height_inches;
     }
 
+    public Player(String first_name, String last_name, int number, int height_feet, int height_inches) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.number = number;
+        this.height_feet = height_feet;
+        this.height_inches = height_inches;
+    }
+
     // setters
-    public void setId(int id) {
+    public void setId(long id) {
         this.player_id = id;
     }
     public void setFirstName(String first_name) {
         this.first_name = first_name;
     }
-    public void setLastName(String first_name) {
+    public void setLastName(String last_name) {
         this.last_name = last_name;
     }
     public void setNumber(int number) {
         this.number = number;
     }
-    public void setHeight(int height_inches, int height_feet) {
+    public void setHeight(int height_feet, int height_inches) {
         this.height_feet = height_feet;
         this.height_inches = height_inches;
     }

@@ -3,26 +3,29 @@ package com.example.justi_000.statbasket;
 
 public class Team
 {
-    int team_id;
+    long team_id;
     String team_name;
     String created_date;
 
     // constructors
     public Team()
     {
+        team_id = 0;
+        team_name = "";
+        created_date = "";
     }
 
     public Team(String name) {
         this.team_name = name;
     }
 
-    public Team(int id, String name) {
+    public Team(long id, String name) {
         this.team_id = id;
         this.team_name = name;
     }
 
     // setters
-    public void setId(int id) {
+    public void setId(long id) {
         this.team_id = id;
     }
 

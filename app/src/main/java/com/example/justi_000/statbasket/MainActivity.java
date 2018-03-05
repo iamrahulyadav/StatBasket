@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle("Your Teams");
 
         myDatabase = new DbHelper(this);
 //        teams = getAllTeams();
@@ -67,26 +68,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onStart()
     {
-//        super.onStart();
-//        teams = getAllTeams();
-//
-//        ListView teamList = findViewById(R.id.lv_team_list);
-//        teamList.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, teams));
-//
-//        teamList.setOnItemClickListener(new AdapterView.OnItemClickListener()
-//        {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-//            {
-//                Intent i = new Intent(MainActivity.this, ViewTeamActivity.class);
-//                bundle.putString("team", teams.get(position));
-//                //needs fixed to get id based on team name in case of deletion and order is not maintained
-//                bundle.putInt("id", position + 1);
-//                i.putExtras(bundle);
-//                startActivity(i);
-//            }
-//        });
         super.onStart();
         teams = myDatabase.getAllTeams();
         team_names = new ArrayList<>();
@@ -105,8 +86,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 Intent i = new Intent(MainActivity.this, ViewTeamActivity.class);
-                bundle.putString("team", teams.get(position).getName());
-                bundle.putLong("id", teams.get(position).getId());
+//                bundle.putString("team", teams.get(position).getName());
+                bundle.putLong("team_id", teams.get(position).getId());
                 i.putExtras(bundle);
                 startActivity(i);
             }
@@ -134,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return true;
             case R.id.add_team:
                 Intent i = new Intent(MainActivity.this, ViewTeamActivity.class);
-                bundle.putString("team", "");
+                bundle.putLong("team_id", -1);
                 i.putExtras(bundle);
                 startActivity(i);
                 return true;
