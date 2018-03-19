@@ -15,61 +15,77 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class DbHelper extends SQLiteOpenHelper {
+public class DbHelper extends SQLiteOpenHelper
+{
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //region DATABASE INFO
 
     // Logcat tag
     private static final String LOG = "DBHelper";
-
     // Database Version
     private static final int DATABASE_VERSION = 1;
-
     // Database Name
     private static final String DATABASE_NAME = "StatBasket";
 
+    //endregion DATABASE INFO
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //TABLE NAMES
+    //region TABLE NAMES
 
     private static final String TABLE_TEAM = "team";
     private static final String TABLE_PLAYER = "player";
     private static final String TABLE_PLAYER_TEAM = "player_team";
+    private static final String TABLE_GAME = "game";
+
+    //endregion TABLE NAMES
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //TABLE COLUMN NAMES
+    //region TABLE COLUMN NAMES
 
-    // COMMON Columns
+    // COMMON COLUMNS
     private static final String COLUMN_CREATED_DATE = "created_date";
 
-    // TEAM Table - column names
-    //COLUMN_TEAM_ID
+    // TEAM COLUMNS
+    private static final String COLUMN_TEAM_ID = "team_id";
     private static final String COLUMN_TEAM_NAME = "team_name";
 
-    // PLAYER Table - column names
-    //COLUMN_PLAYER_ID
+    // PLAYER COLUMNS
+    private static final String COLUMN_PLAYER_ID = "player_id";
     private static final String COLUMN_FIRST_NAME = "first_name";
     private static final String COLUMN_LAST_NAME = "last_name";
     private static final String COLUMN_NUMBER = "number";
     private static final String COLUMN_HEIGHT_FEET = "height_feet";
     private static final String COLUMN_HEIGHT_INCHES = "height_inches";
 
-    // PLAYER_TEAM Table - column names - also shared with TEAM and PLAYER tables
+    // PLAYER_TEAM COLUMNS
     private static final String COLUMN_PLAYER_TEAM_ID = "player_team_id";
-    private static final String COLUMN_TEAM_ID = "team_id";
-    private static final String COLUMN_PLAYER_ID = "player_id";
+
+    // GAME COLUMNS
+    private static final String COLUMN_GAME_ID = "game_id";
+    private static final String COLUMN_HOME_TEAM_ID = "home_team_id";
+    private static final String COLUMN_AWAY_TEAM_ID = "away_team_id";
+    private static final String COLUMN_LOCATION = "location";
+
+    //endregion TABLE COLUMN NAMES
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //CREATE TABLE STATEMENTS
+    //region CREATE TABLE STATEMENTS
 
     // TEAM table create statement
-    private static final String CREATE_TABLE_TEAM = "CREATE TABLE "
-            + TABLE_TEAM + "(" + COLUMN_TEAM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TEAM_NAME
-            + " TEXT," + COLUMN_CREATED_DATE + " DATETIME)";
+    private static final String CREATE_TABLE_TEAM = "CREATE TABLE " + TABLE_TEAM + "("
+            + COLUMN_TEAM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_TEAM_NAME + " TEXT,"
+            + COLUMN_CREATED_DATE + " DATETIME)";
 
     // PLAYER table create statement
-    private static final String CREATE_TABLE_PLAYER = "CREATE TABLE " + TABLE_PLAYER
-            + "(" + COLUMN_PLAYER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_FIRST_NAME + " TEXT,"
-            + COLUMN_LAST_NAME + " TEXT," + COLUMN_NUMBER + " INTEGER,"
-            + COLUMN_HEIGHT_FEET + " INTEGER," + COLUMN_HEIGHT_INCHES + " INTEGER,"
-            + COLUMN_CREATED_DATE + " DATETIME" + ")";
+    private static final String CREATE_TABLE_PLAYER = "CREATE TABLE " + TABLE_PLAYER + "("
+            + COLUMN_PLAYER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_FIRST_NAME + " TEXT,"
+            + COLUMN_LAST_NAME + " TEXT,"
+            + COLUMN_NUMBER + " INTEGER,"
+            + COLUMN_HEIGHT_FEET + " INTEGER,"
+            + COLUMN_HEIGHT_INCHES + " INTEGER,"
+            + COLUMN_CREATED_DATE + " DATETIME)";
 
     // PLAYER_TEAM table create statement
 //    private static final String CREATE_TABLE_PLAYER_TEAM = "CREATE TABLE "
@@ -77,13 +93,23 @@ public class DbHelper extends SQLiteOpenHelper {
 //            + COLUMN_CREATED_DATE + " DATETIME, " + "PRIMARY KEY (" + COLUMN_TEAM_ID + ", " + COLUMN_PLAYER_ID + "))";
 
 
-    private static final String CREATE_TABLE_PLAYER_TEAM = "CREATE TABLE "
-            + TABLE_PLAYER_TEAM + "(" + COLUMN_PLAYER_TEAM_ID + " INTEGER PRIMARY KEY,"
-            + COLUMN_TEAM_ID + " INTEGER," + COLUMN_PLAYER_ID + " INTEGER,"
-            + COLUMN_CREATED_DATE + " DATETIME" + ")";
+    private static final String CREATE_TABLE_PLAYER_TEAM = "CREATE TABLE " + TABLE_PLAYER_TEAM + "("
+            + COLUMN_PLAYER_TEAM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_TEAM_ID + " INTEGER,"
+            + COLUMN_PLAYER_ID + " INTEGER,"
+            + COLUMN_CREATED_DATE + " DATETIME)";
+
+    private static final String CREATE_TABLE_GAME = "CREATE TABLE " + TABLE_GAME + "("
+            + COLUMN_GAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_HOME_TEAM_ID + " INTEGER,"
+            + COLUMN_AWAY_TEAM_ID + " INTEGER,"
+            + COLUMN_LOCATION + " TEXT,"
+            + COLUMN_CREATED_DATE + " DATETIME)";
+
+    //endregion CREATE TABLE STATEMENTS
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //DbHelper METHODS
+    //region DbHelper METHODS (Create and Drop Tables)
 
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -96,6 +122,7 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_PLAYER);
         db.execSQL(CREATE_TABLE_TEAM);
         db.execSQL(CREATE_TABLE_PLAYER_TEAM);
+        db.execSQL(CREATE_TABLE_GAME);
     }
 
     @Override
@@ -104,13 +131,16 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEAM);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYER_TEAM);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_GAME);
 
         // create new tables
         onCreate(db);
     }
 
+    //endregion DbHelper METHODS (Create and Drop Tables)
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //PLAYER METHODS
+    //region PLAYER METHODS
 
     public long createPlayer(Player player, long team_id) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -158,31 +188,6 @@ public class DbHelper extends SQLiteOpenHelper {
         return player;
     }
 
-//    public Player getPlayer(String player_id) {
-//        SQLiteDatabase db = this.getReadableDatabase();
-//
-//        String query = "SELECT  * FROM " + TABLE_PLAYER
-//                + " WHERE " + COLUMN_PLAYER_ID + " = " + player_id;
-//
-//        Log.e(LOG, query);
-//
-//        Cursor cursor = db.rawQuery(query, null);
-//
-//        if (cursor != null)
-//            cursor.moveToFirst();
-//
-//        Player player = new Player();
-//        player.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_PLAYER_ID)));
-//        player.setFirstName((cursor.getString(cursor.getColumnIndex(COLUMN_FIRST_NAME))));
-//        player.setLastName((cursor.getString(cursor.getColumnIndex(COLUMN_LAST_NAME))));
-//        player.setNumber((cursor.getInt(cursor.getColumnIndex(COLUMN_NUMBER))));
-//        player.setHeightFeet((cursor.getInt(cursor.getColumnIndex(COLUMN_HEIGHT_FEET))));
-//        player.setHeightInches((cursor.getInt(cursor.getColumnIndex(COLUMN_HEIGHT_INCHES))));
-//        player.setCreatedDate(cursor.getString(cursor.getColumnIndex(COLUMN_CREATED_DATE)));
-//
-//        return player;
-//    }
-
     public List<Player> getAllPlayers(long team_id) {
         List<Player> players = new ArrayList<>();
         String query = "SELECT  P." + COLUMN_PLAYER_ID + ", P." + COLUMN_FIRST_NAME + ", P." + COLUMN_LAST_NAME
@@ -213,8 +218,37 @@ public class DbHelper extends SQLiteOpenHelper {
         return players;
     }
 
+    public int updatePlayer(Player player) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        if(player.getId() > 0) {
+            values.put(COLUMN_FIRST_NAME, player.getFirstName());
+            values.put(COLUMN_LAST_NAME, player.getLastName());
+            values.put(COLUMN_NUMBER, player.getNumber());
+            values.put(COLUMN_HEIGHT_FEET, player.getHeightFeet());
+            values.put(COLUMN_HEIGHT_INCHES, player.getHeightInches());
+
+            return db.update(TABLE_PLAYER, values, COLUMN_PLAYER_ID + " = ?",
+                    new String[]{String.valueOf(player.getId())});
+        }
+        else return 0;
+    }
+
+
+    public int deletePlayer(long player_id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        if(player_id > 0) {
+            return db.delete(TABLE_PLAYER, COLUMN_PLAYER_ID + " = ?",
+                    new String[]{String.valueOf(player_id)});
+        }
+        else return 0;
+    }
+
+    //endregion PLAYER METHODS
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //TEAM METHODS
+    //region TEAM METHODS
 
     public long createTeam(Team team) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -251,27 +285,6 @@ public class DbHelper extends SQLiteOpenHelper {
 
         return team;
     }
-
-//    public Team getTeam(String team_id) {
-//        SQLiteDatabase db = this.getReadableDatabase();
-//
-//        String query = "SELECT  * FROM " + TABLE_TEAM + " WHERE "
-//                + COLUMN_TEAM_ID + " = " + team_id;
-//
-//        Log.e(LOG, query);
-//
-//        Cursor cursor = db.rawQuery(query, null);
-//
-//        if (cursor != null)
-//            cursor.moveToFirst();
-//
-//        Team team = new Team();
-//        team.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_TEAM_ID)));
-//        team.setName((cursor.getString(cursor.getColumnIndex(COLUMN_TEAM_NAME))));
-//        team.setCreatedDate(cursor.getString(cursor.getColumnIndex(COLUMN_CREATED_DATE)));
-//
-//        return team;
-//    }
 
     public List<Team> getAllTeams() {
         List<Team> teams = new ArrayList<Team>();
@@ -319,8 +332,10 @@ public class DbHelper extends SQLiteOpenHelper {
         else return 0;
     }
 
+    //endregion TEAM METHODS
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //PLAYER_TEAM METHODS
+    //region PLAYER_TEAM METHODS
 
     public long createPlayerTeam(long player_id, long team_id) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -341,4 +356,85 @@ public class DbHelper extends SQLiteOpenHelper {
         Date date = new Date();
         return dateFormat.format(date);
     }
+
+    //endregion PLAYER_TEAM METHODS
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //region GAME METHODS
+
+    public long createGame(Game game) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_HOME_TEAM_ID, game.getHomeTeamId());
+        values.put(COLUMN_AWAY_TEAM_ID, game.getAwayTeamId());
+        values.put(COLUMN_LOCATION, game.getLocation());
+        values.put(COLUMN_CREATED_DATE, getCurrentDateTime());
+
+        // insert row
+        long game_id = db.insert(TABLE_GAME, null, values);
+
+        return game_id;
+    }
+
+    public Game getGame(long game_id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT  * FROM " + TABLE_GAME + " WHERE "
+                + COLUMN_GAME_ID + " = " + game_id;
+
+        Log.e(LOG, query);
+
+        Cursor cursor = db.rawQuery(query, null);
+        Game game = new Game();
+
+        if (cursor.getCount() != 0) {
+            cursor.moveToFirst();
+
+            game.setGameId((cursor.getLong(cursor.getColumnIndex(COLUMN_GAME_ID))));
+            game.setHomeTeamId((cursor.getLong(cursor.getColumnIndex(COLUMN_HOME_TEAM_ID))));
+            game.setAwayTeamId((cursor.getLong(cursor.getColumnIndex(COLUMN_AWAY_TEAM_ID))));
+            game.setLocation((cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION))));
+            game.setCreatedDate(cursor.getString(cursor.getColumnIndex(COLUMN_CREATED_DATE)));
+        }
+
+        return game;
+    }
+
+    public List<Game> getAllGames(long team_id) {
+        List<Game> games = new ArrayList<Game>();
+        String query = "SELECT * FROM " + TABLE_GAME
+                + " WHERE " + COLUMN_HOME_TEAM_ID + " = " + team_id
+                + " OR " + COLUMN_AWAY_TEAM_ID + " = " + team_id;
+//        String query = "SELECT  G." + COLUMN_GAME_ID
+//                + ", G." + COLUMN_HOME_TEAM_ID
+//                + ", G." + COLUMN_AWAY_TEAM_ID
+//                + ", G." + COLUMN_LOCATION
+//                + ", G." + COLUMN_CREATED_DATE
+//                + " FROM " + TABLE_GAME + " G"
+//                + " WHERE " + COLUMN_HOME_TEAM_ID + " = " + team_id
+//                + " OR " + COLUMN_AWAY_TEAM_ID + " = " + team_id;
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        //add all rows from database to list of teams
+        if (cursor.getCount() != 0) {
+            do {
+                Game game = new Game();
+                game.setGameId(cursor.getLong(cursor.getColumnIndex(COLUMN_GAME_ID)));
+                game.setHomeTeamId(cursor.getLong(cursor.getColumnIndex(COLUMN_HOME_TEAM_ID)));
+                game.setAwayTeamId(cursor.getLong(cursor.getColumnIndex(COLUMN_AWAY_TEAM_ID)));
+                game.setLocation(cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION)));
+                game.setCreatedDate(cursor.getString(cursor.getColumnIndex(COLUMN_CREATED_DATE)));
+                games.add(game);
+            } while (cursor.moveToNext());
+        }
+
+        return games;
+    }
+
+    //endregion GAME METHODS
 }

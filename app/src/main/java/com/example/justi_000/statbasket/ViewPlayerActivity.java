@@ -1,5 +1,6 @@
 package com.example.justi_000.statbasket;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -19,6 +20,8 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
 {
     DbHelper myDatabase;
     Bundle bundle = new Bundle();
+    Player player;
+    Team team;
 
     EditText editFirstName;
     EditText editLastName;
@@ -49,20 +52,10 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
         btnDelete = findViewById(R.id.btn_delete);
 
         bundle = getIntent().getExtras();
-        Team team = myDatabase.getTeam(bundle.getLong("team_id", 0));
-        Player player = myDatabase.getPlayer(bundle.getLong("player_id", 0));
-//        String team_name = bundle.getString("team_name");
-//        long team_id = bundle.getLong("team_id");
-//        String first_name = bundle.getString("first_name");
-//        String last_name = bundle.getString("last_name");
-//        int number = bundle.getInt("number");
-//        int height_feet = bundle.getInt("height_feet");
-//        int height_inches = bundle.getInt("height_inches");
-//        int player_id = bundle.getInt("player_id");
-//
-//        editFirstName.setText(first_name);
-//        editLastName.setText(last_name);
-//        editNumber.setText(number);
+        if(bundle != null) {
+            team = myDatabase.getTeam(bundle.getLong("team_id", 0));
+            player = myDatabase.getPlayer(bundle.getLong("player_id", 0));
+        }
 
         String[] feet_spinner = new String[] {"3", "4", "5", "6", "7", "8"};
         String[] inches_spinner = new String[] {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"};
@@ -107,9 +100,8 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
 
         addPlayer(team);
         viewAllPlayers(team);
-        updateTeam();
-        deleteTeam();
-//        returnToTeams();
+        updatePlayer();
+        deletePlayer();
     }
 
 //    @Override
@@ -202,49 +194,52 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
         );
     }
 
-    public void updateTeam()
+    public void updatePlayer()
     {
-//        btnUpdate.setOnClickListener(
-//                new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v)
-//                    {
-//                        Team team = myDatabase.getTeam(tvIdValue.getText().toString());
-//                        team.setName(editTeamName.getText().toString());
-//                        int isUpdated = myDatabase.updateTeam(team);
-//                        if (isUpdated == 1) {
-//                            team = myDatabase.getTeam(tvIdValue.getText().toString());
-//                            setTitle(team.getName());
-////                        editTeamName.setText(team.getName());
-////                        editTeamName.setSelection(editTeamName.getText().length());
-//                            Toast.makeText(ViewTeamActivity.this, team.getName() + " Updated", Toast.LENGTH_LONG).show();
-//                        }
-//                        else {
-//                            Toast.makeText(ViewTeamActivity.this, "Update Failed", Toast.LENGTH_LONG).show();
-//                        }
-//                    }
-//                }
-//        );
+        btnUpdate.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v)
+                    {
+//                        Player player = myDatabase.getPlayer(tvIdValue.getText().toString());
+                        player.setFirstName(editFirstName.getText().toString());
+                        player.setLastName(editLastName.getText().toString());
+                        player.setNumber(Integer.valueOf(editNumber.getText().toString()));
+                        player.setHeightFeet(Integer.valueOf(spinFeet.getSelectedItem().toString()));
+                        player.setHeightInches(Integer.valueOf(spinInches.getSelectedItem().toString()));
+                        int isUpdated = myDatabase.updatePlayer(player);
+                        if (isUpdated == 1) {
+                            player = myDatabase.getPlayer(player.getId());
+                            setTitle(player.getFirstName() + player.getLastName());
+                            Toast.makeText(ViewPlayerActivity.this, player.getFirstName() +  " " + player.getLastName() + " Updated", Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            Toast.makeText(ViewPlayerActivity.this, "Update Failed", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+        );
     }
 
-    public void deleteTeam()
+    public void deletePlayer()
     {
-//        btnDelete.setOnClickListener(
-//                new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v)
-//                    {
-//                        Team team = myDatabase.getTeam(tvIdValue.getText().toString());
-//                        int isUpdated = myDatabase.deleteTeam(team.getId());
-//                        if (isUpdated == 1)
-//                            Toast.makeText(ViewTeamActivity.this, team.getName() + " Deleted", Toast.LENGTH_LONG).show();
-//                        else
-//                            Toast.makeText(ViewTeamActivity.this, "Deletion Failed", Toast.LENGTH_LONG).show();
-//                        Intent intent = new Intent(ViewTeamActivity.this, MainActivity.class);
-//                        startActivity(intent);
-//                    }
-//                }
-//        );
+        btnDelete.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        int isUpdated = myDatabase.deletePlayer(player.getId());
+                        if (isUpdated == 1)
+                            Toast.makeText(ViewPlayerActivity.this, player.getFirstName() + " " + player.getLastName() + " Deleted", Toast.LENGTH_LONG).show();
+                        else
+                            Toast.makeText(ViewPlayerActivity.this, "Deletion Failed", Toast.LENGTH_LONG).show();
+                        Intent i = new Intent(ViewPlayerActivity.this, EditTeamActivity.class);
+                        bundle.putLong("team_id", team.getId());
+                        i.putExtras(bundle);
+                        startActivity(i);
+                    }
+                }
+        );
     }
 
     public void showMessage(String title, String message)

@@ -31,38 +31,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_list_view);
         setTitle("Your Teams");
 
         myDatabase = new DbHelper(this);
-//        teams = getAllTeams();
-////        Bundle bundle = getIntent().getExtras();
-////        List<String> teams = new ArrayList<>(50);
-////        if (getCallingActivity() != null) {
-//////            if (getCallingActivity().getClassName() == "com.example.justi_000.statbasket.ViewTeamActivity") {
-////                teams = bundle.getStringArrayList("teams");
-//////            }
-////        }
-//
-////        final String[] teamArray = new String[] {"Lorem","Ipsum","dolor","sit","amet"};
-//
-//        ListView teamList = findViewById(R.id.lv_team_list);
-//        teamList.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, teams));
-//
-//        teamList.setOnItemClickListener(new AdapterView.OnItemClickListener()
-//        {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-//            {
-//                Intent i = new Intent(MainActivity.this, ViewTeamActivity.class);
-//                bundle.putString("team", teams.get(position));
-//                i.putExtras(bundle);
-//                startActivity(i);
-//            }
-//        });
-
-        //getAllTeams();
     }
 
     @Override
@@ -76,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             team_names.add(team.getName());
         }
 
-        lvTeamList = findViewById(R.id.lv_team_list);
+        lvTeamList = findViewById(R.id.lv_item_list);
         lvTeamList.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, team_names));
 
         lvTeamList.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -123,20 +95,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return super.onOptionsItemSelected(item);
         }
     }
-
-//    public ArrayList<String> getAllTeams()
-//    {
-//        Cursor result = myDatabase.getAllData();
-//        if (result.getCount() == 0)
-//        {
-//            return new ArrayList<String>(50);
-//        }
-//
-//        List<String> teamList = new ArrayList(50);
-//        while (result.moveToNext())
-//        {
-//            teamList.add(result.getString(1));
-//        }
-//        return (ArrayList<String>) teamList;
-//    }
 }

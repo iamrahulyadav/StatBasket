@@ -26,7 +26,8 @@ public class ViewTeamActivity extends AppCompatActivity implements View.OnClickL
     Button btnUpdate;
     Button btnDelete;
     Button btnAddPlayer;
-    Button btnEditTeam;
+    Button btnPlayers;
+    Button btnGames;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -43,8 +44,14 @@ public class ViewTeamActivity extends AppCompatActivity implements View.OnClickL
         btnUpdate = findViewById(R.id.btn_update);
         btnDelete = findViewById(R.id.btn_delete);
         btnAddPlayer = findViewById(R.id.btn_add_player);
-        btnEditTeam = findViewById(R.id.btn_edit_team);
+        btnPlayers = findViewById(R.id.btn_players);
+        btnGames = findViewById(R.id.btn_games);
+    }
 
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
         bundle = getIntent().getExtras();
         if (bundle != null)
             team = myDatabase.getTeam(bundle.getLong("team_id", 0));
@@ -63,8 +70,8 @@ public class ViewTeamActivity extends AppCompatActivity implements View.OnClickL
         updateTeam();
         deleteTeam();
         addPlayer(team);
-        editTeam();
-//        returnToTeams();
+        viewPlayers();
+        viewGames();
     }
 
     @Override
@@ -191,9 +198,9 @@ public class ViewTeamActivity extends AppCompatActivity implements View.OnClickL
         );
     }
 
-    public void editTeam()
+    public void viewPlayers()
     {
-        btnEditTeam.setOnClickListener(
+        btnPlayers.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v)
@@ -212,36 +219,25 @@ public class ViewTeamActivity extends AppCompatActivity implements View.OnClickL
         );
     }
 
-//    public void returnToTeams()
-//    {
-//        btnSaveData.setOnClickListener(
-//                new View.OnClickListener()
-//                {
-//                    @Override
-//                    public void onClick(View v)
-//                    {
-//                        Cursor result = myDatabase.getAllData();
-//                        if (result.getCount() == 0)
-//                        {
-//                            showMessage("Error", "No Data Found");
-//                            return;
-//                        }
-//                        List<String> teamList = new ArrayList(50);
-//                        Intent i = new Intent(ViewTeamActivity.this, MainActivity.class);
-//                        Bundle bundle = new Bundle();
-//
-//                        startActivity(i);
-//                        while (result.moveToNext())
-//                        {
-//                            teamList.add(result.getString(1));
-//                        }
-//                        bundle.putStringArrayList("teams", (ArrayList<String>) teamList);
-//                        i.putExtras(bundle);
-//                        startActivityForResult(i, 0);
-//                    }
-//                }
-//        );
-//    }
+    public void viewGames()
+    {
+        btnGames.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v)
+                    {
+//                        Team team = myDatabase.getTeam(Integer.valueOf(tvIdValue.getText().toString()));
+                        if (team.getId() > 0)
+                        {
+                            Intent i = new Intent(ViewTeamActivity.this, GameListActivity.class);
+                            bundle.putLong("team_id", team.getId());
+                            i.putExtras(bundle);
+                            startActivity(i);
+                        }
+                    }
+                }
+        );
+    }
 
     public void showMessage(String title, String message)
     {

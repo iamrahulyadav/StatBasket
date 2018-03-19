@@ -1,5 +1,6 @@
 package com.example.justi_000.statbasket;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,14 +15,13 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class EditTeamActivity extends AppCompatActivity implements View.OnClickListener
+public class GameListActivity extends AppCompatActivity implements View.OnClickListener
 {
     DbHelper myDatabase;
     Bundle bundle = new Bundle();
-    ListView lvPlayerList;
-    List<Player> players;
-    List<String> player_names;
+    ListView lvGameList;
+    List<Game> games;
+    List<String> game_names;
     Team team;
 
     @Override
@@ -54,25 +54,33 @@ public class EditTeamActivity extends AppCompatActivity implements View.OnClickL
         if (team.getId() > 0)
         {
             setTitle(team.getName());
-            players = myDatabase.getAllPlayers(team.getId());
+            Game tempGame = new Game(1,2,"KC");
+            long team_id = myDatabase.createGame(tempGame);
+            games = myDatabase.getAllGames(team.getId());
         }
-        player_names = new ArrayList<>();
-        for(Player player : players)
+        game_names = new ArrayList<>();
+        for(Game game : games)
         {
-            player_names.add(player.getFirstName() + " " + player.getLastName());
+            Team homeTeam = myDatabase.getTeam(game.getHomeTeamId());
+            Team awayTeam = myDatabase.getTeam(game.getAwayTeamId());
+            String game_name = "";
+            if (homeTeam.getName().length() > 0)
+                game_name += homeTeam.getName();
+            if (awayTeam.getName().length() > 0)
+                game_name = game_name + " vs. " + awayTeam.getName();
+            game_names.add(game_name);
         }
 
-        lvPlayerList = findViewById(R.id.lv_item_list);
-        lvPlayerList.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, player_names));
+        lvGameList.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, game_names));
 
-        lvPlayerList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        lvGameList.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                Intent i = new Intent(EditTeamActivity.this, ViewPlayerActivity.class);
-                bundle.putLong("player_id", players.get(position).getId());
+                Intent i = new Intent(GameListActivity.this, ViewGameActivity.class);
+                bundle.putLong("game_id", games.get(position).getGameId());
                 i.putExtras(bundle);
                 startActivity(i);
             }
@@ -99,7 +107,7 @@ public class EditTeamActivity extends AppCompatActivity implements View.OnClickL
                 startActivity(new Intent(this, MainActivity.class));
                 return true;
             case R.id.add_player:
-                Intent i = new Intent(EditTeamActivity.this, ViewPlayerActivity.class);
+                Intent i = new Intent(GameListActivity.this, ViewGameActivity.class);
                 bundle.putString("team_id", "");
                 i.putExtras(bundle);
                 startActivity(i);
