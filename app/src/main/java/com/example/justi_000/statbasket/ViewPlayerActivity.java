@@ -3,8 +3,12 @@ package com.example.justi_000.statbasket;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -85,18 +89,6 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
         editNumber.setText(String.valueOf(player.getNumber()));
 
         setTitle("Add/Edit Player on " + team.getName());
-
-//        int compareValue = height_feet;
-//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.height_feet_list, android.R.layout.simple_spinner_item);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        spinFeet.setAdapter(adapter);
-//        if (compareValue != 0) {
-//            int spinnerPosition = adapter.getPosition(compareValue);
-//            spinFeet.setSelection(spinnerPosition);
-//        }
-
-//        editFirstName.setSelection(editFirstName.getText().length());
-//        setTitle(first_name + last_name);
 
         addPlayer(team);
         viewAllPlayers(team);
@@ -240,6 +232,35 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
                     }
                 }
         );
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(false); // Remove the left caret
+        }
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.edit_team_menu, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.home:
+                startActivity(new Intent(this, MainActivity.class));
+                return true;
+            case R.id.add_player:
+                Intent i = new Intent(ViewPlayerActivity.this, ViewGameActivity.class);
+                bundle.putString("team_id", "");
+                i.putExtras(bundle);
+                startActivity(i);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public void showMessage(String title, String message)

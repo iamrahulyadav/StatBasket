@@ -100,7 +100,7 @@ public class EditTeamActivity extends AppCompatActivity implements View.OnClickL
                 return true;
             case R.id.add_player:
                 Intent i = new Intent(EditTeamActivity.this, ViewPlayerActivity.class);
-                bundle.putString("team_id", "");
+                bundle.putLong("team_id", team.getId());
                 i.putExtras(bundle);
                 startActivity(i);
                 return true;

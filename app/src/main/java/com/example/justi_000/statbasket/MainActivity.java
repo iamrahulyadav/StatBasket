@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 Intent i = new Intent(MainActivity.this, ViewTeamActivity.class);
-//                bundle.putString("team", teams.get(position).getName());
                 bundle.putLong("team_id", teams.get(position).getId());
                 i.putExtras(bundle);
                 startActivity(i);

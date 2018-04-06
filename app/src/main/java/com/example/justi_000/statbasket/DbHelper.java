@@ -23,7 +23,7 @@ public class DbHelper extends SQLiteOpenHelper
     // Logcat tag
     private static final String LOG = "DBHelper";
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     // Database Name
     private static final String DATABASE_NAME = "StatBasket";
 
@@ -93,12 +93,14 @@ public class DbHelper extends SQLiteOpenHelper
 //            + COLUMN_CREATED_DATE + " DATETIME, " + "PRIMARY KEY (" + COLUMN_TEAM_ID + ", " + COLUMN_PLAYER_ID + "))";
 
 
+    // PLAYER_TEAM table create statement
     private static final String CREATE_TABLE_PLAYER_TEAM = "CREATE TABLE " + TABLE_PLAYER_TEAM + "("
             + COLUMN_PLAYER_TEAM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + COLUMN_TEAM_ID + " INTEGER,"
             + COLUMN_PLAYER_ID + " INTEGER,"
             + COLUMN_CREATED_DATE + " DATETIME)";
 
+    // GAME table create statement
     private static final String CREATE_TABLE_GAME = "CREATE TABLE " + TABLE_GAME + "("
             + COLUMN_GAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + COLUMN_HOME_TEAM_ID + " INTEGER,"
@@ -286,6 +288,27 @@ public class DbHelper extends SQLiteOpenHelper
         return team;
     }
 
+    public Team getTeamFromName(String team_name) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT * FROM " + TABLE_TEAM + " WHERE "
+                + COLUMN_TEAM_NAME + " = '" + team_name + "'";
+
+        Log.e(LOG, query);
+
+        Cursor cursor = db.rawQuery(query, null);
+        Team team = new Team();
+
+        if (cursor.moveToFirst())
+        {
+            team.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_TEAM_ID)));
+            team.setName((cursor.getString(cursor.getColumnIndex(COLUMN_TEAM_NAME))));
+            team.setCreatedDate(cursor.getString(cursor.getColumnIndex(COLUMN_CREATED_DATE)));
+        }
+
+        return team;
+    }
+
     public List<Team> getAllTeams() {
         List<Team> teams = new ArrayList<Team>();
         String query = "SELECT  * FROM " + TABLE_TEAM;
@@ -402,18 +425,11 @@ public class DbHelper extends SQLiteOpenHelper
     }
 
     public List<Game> getAllGames(long team_id) {
-        List<Game> games = new ArrayList<Game>();
+        List<Game> games = new ArrayList<>();
         String query = "SELECT * FROM " + TABLE_GAME
                 + " WHERE " + COLUMN_HOME_TEAM_ID + " = " + team_id
-                + " OR " + COLUMN_AWAY_TEAM_ID + " = " + team_id;
-//        String query = "SELECT  G." + COLUMN_GAME_ID
-//                + ", G." + COLUMN_HOME_TEAM_ID
-//                + ", G." + COLUMN_AWAY_TEAM_ID
-//                + ", G." + COLUMN_LOCATION
-//                + ", G." + COLUMN_CREATED_DATE
-//                + " FROM " + TABLE_GAME + " G"
-//                + " WHERE " + COLUMN_HOME_TEAM_ID + " = " + team_id
-//                + " OR " + COLUMN_AWAY_TEAM_ID + " = " + team_id;
+                + " OR " + COLUMN_AWAY_TEAM_ID + " = " + team_id
+                + " ORDER BY " + COLUMN_CREATED_DATE + " DESC";
 
         Log.e(LOG, query);
 
@@ -421,12 +437,12 @@ public class DbHelper extends SQLiteOpenHelper
         Cursor cursor = db.rawQuery(query, null);
 
         //add all rows from database to list of teams
-        if (cursor.getCount() != 0) {
+        if (cursor.moveToFirst()) {
             do {
                 Game game = new Game();
-                game.setGameId(cursor.getLong(cursor.getColumnIndex(COLUMN_GAME_ID)));
-                game.setHomeTeamId(cursor.getLong(cursor.getColumnIndex(COLUMN_HOME_TEAM_ID)));
-                game.setAwayTeamId(cursor.getLong(cursor.getColumnIndex(COLUMN_AWAY_TEAM_ID)));
+                game.setGameId(cursor.getInt(cursor.getColumnIndex(COLUMN_GAME_ID)));
+                game.setHomeTeamId(cursor.getInt(cursor.getColumnIndex(COLUMN_HOME_TEAM_ID)));
+                game.setAwayTeamId(cursor.getInt(cursor.getColumnIndex(COLUMN_AWAY_TEAM_ID)));
                 game.setLocation(cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION)));
                 game.setCreatedDate(cursor.getString(cursor.getColumnIndex(COLUMN_CREATED_DATE)));
                 games.add(game);
