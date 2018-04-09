@@ -23,7 +23,7 @@ public class DbHelper extends SQLiteOpenHelper
     // Logcat tag
     private static final String LOG = "DBHelper";
     // Database Version
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 6;
     // Database Name
     private static final String DATABASE_NAME = "StatBasket";
 
@@ -36,6 +36,7 @@ public class DbHelper extends SQLiteOpenHelper
     private static final String TABLE_PLAYER = "player";
     private static final String TABLE_PLAYER_TEAM = "player_team";
     private static final String TABLE_GAME = "game";
+    private static final String TABLE_ACTIVE_PLAYERS = "active_players";
 
     //endregion TABLE NAMES
 
@@ -66,6 +67,13 @@ public class DbHelper extends SQLiteOpenHelper
     private static final String COLUMN_AWAY_TEAM_ID = "away_team_id";
     private static final String COLUMN_LOCATION = "location";
 
+    // ACTIVE_PLAYERS COLUMNS
+    private static final String COLUMN_PLAYER1_ID = "player1";
+    private static final String COLUMN_PLAYER2_ID = "player2";
+    private static final String COLUMN_PLAYER3_ID = "player3";
+    private static final String COLUMN_PLAYER4_ID = "player4";
+    private static final String COLUMN_PLAYER5_ID = "player5";
+
     //endregion TABLE COLUMN NAMES
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +82,7 @@ public class DbHelper extends SQLiteOpenHelper
     // TEAM table create statement
     private static final String CREATE_TABLE_TEAM = "CREATE TABLE " + TABLE_TEAM + "("
             + COLUMN_TEAM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + COLUMN_TEAM_NAME + " TEXT,"
+            + COLUMN_TEAM_NAME + " TEXT NOT NULL UNIQUE,"
             + COLUMN_CREATED_DATE + " DATETIME)";
 
     // PLAYER table create statement
@@ -86,12 +94,6 @@ public class DbHelper extends SQLiteOpenHelper
             + COLUMN_HEIGHT_FEET + " INTEGER,"
             + COLUMN_HEIGHT_INCHES + " INTEGER,"
             + COLUMN_CREATED_DATE + " DATETIME)";
-
-    // PLAYER_TEAM table create statement
-//    private static final String CREATE_TABLE_PLAYER_TEAM = "CREATE TABLE "
-//            + TABLE_PLAYER_TEAM + "(" +  COLUMN_TEAM_ID + " INTEGER," + COLUMN_PLAYER_ID + " INTEGER,"
-//            + COLUMN_CREATED_DATE + " DATETIME, " + "PRIMARY KEY (" + COLUMN_TEAM_ID + ", " + COLUMN_PLAYER_ID + "))";
-
 
     // PLAYER_TEAM table create statement
     private static final String CREATE_TABLE_PLAYER_TEAM = "CREATE TABLE " + TABLE_PLAYER_TEAM + "("
@@ -107,6 +109,15 @@ public class DbHelper extends SQLiteOpenHelper
             + COLUMN_AWAY_TEAM_ID + " INTEGER,"
             + COLUMN_LOCATION + " TEXT,"
             + COLUMN_CREATED_DATE + " DATETIME)";
+
+    // ACTIVE_PLAYERS table create statement
+    private static final String CREATE_TABLE_ACTIVE_PLAYERS = "CREATE TABLE " + TABLE_ACTIVE_PLAYERS + "("
+            + COLUMN_GAME_ID + " INTEGER PRIMARY KEY,"
+            + COLUMN_PLAYER1_ID + " INTEGER,"
+            + COLUMN_PLAYER2_ID + " INTEGER,"
+            + COLUMN_PLAYER3_ID + " INTEGER,"
+            + COLUMN_PLAYER4_ID + " INTEGER,"
+            + COLUMN_PLAYER5_ID + " INTEGER)";
 
     //endregion CREATE TABLE STATEMENTS
 
@@ -125,6 +136,7 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL(CREATE_TABLE_TEAM);
         db.execSQL(CREATE_TABLE_PLAYER_TEAM);
         db.execSQL(CREATE_TABLE_GAME);
+        db.execSQL(CREATE_TABLE_ACTIVE_PLAYERS);
     }
 
     @Override
@@ -134,6 +146,7 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEAM);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYER_TEAM);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_GAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVE_PLAYERS);
 
         // create new tables
         onCreate(db);
@@ -452,5 +465,167 @@ public class DbHelper extends SQLiteOpenHelper
         return games;
     }
 
+    public int updateGame(Game game) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        if(game.getGameId() > 0) {
+            values.put(COLUMN_HOME_TEAM_ID, game.getHomeTeamId());
+            values.put(COLUMN_AWAY_TEAM_ID, game.getAwayTeamId());
+            values.put(COLUMN_LOCATION, game.getLocation());
+
+            return db.update(TABLE_GAME, values, COLUMN_GAME_ID + " = ?",
+                    new String[]{String.valueOf(game.getGameId())});
+        }
+        else return 0;
+    }
+
     //endregion GAME METHODS
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //region ACTIVE_PLAYERS METHODS
+
+    public long createActivePlayers(long game_id, List<Player> player_list) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_GAME_ID, game_id);
+//        values.put(COLUMN_PLAYER1_ID, 1);
+//        values.put(COLUMN_PLAYER2_ID, 2);
+//        values.put(COLUMN_PLAYER3_ID, 3);
+//        values.put(COLUMN_PLAYER4_ID, 4);
+//        values.put(COLUMN_PLAYER5_ID, 5);
+
+        for (int index = 0; index < player_list.size(); index++) {
+            switch (index) {
+                case 0:
+                    values.put(COLUMN_PLAYER1_ID, player_list.get(0).getId());
+                    break;
+                case 1:
+                    values.put(COLUMN_PLAYER2_ID, player_list.get(1).getId());
+                    break;
+                case 2:
+                    values.put(COLUMN_PLAYER3_ID, player_list.get(2).getId());
+                    break;
+                case 3:
+                    values.put(COLUMN_PLAYER4_ID, player_list.get(3).getId());
+                    break;
+                case 4:
+                    values.put(COLUMN_PLAYER5_ID, player_list.get(4).getId());
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // insert row
+        long gameID = db.insert(TABLE_ACTIVE_PLAYERS, null, values);
+
+        return gameID;
+    }
+
+    public long updateActivePlayers(long game_id, List<Player> player_list) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        if (game_id > 0) {
+            for (int index = 0; index < player_list.size(); index++) {
+                switch (index) {
+                    case 0:
+                        values.put(COLUMN_PLAYER1_ID, player_list.get(0).getId());
+                        break;
+                    case 1:
+                        values.put(COLUMN_PLAYER2_ID, player_list.get(1).getId());
+                        break;
+                    case 2:
+                        values.put(COLUMN_PLAYER3_ID, player_list.get(2).getId());
+                        break;
+                    case 3:
+                        values.put(COLUMN_PLAYER4_ID, player_list.get(3).getId());
+                        break;
+                    case 4:
+                        values.put(COLUMN_PLAYER5_ID, player_list.get(4).getId());
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            return db.update(TABLE_ACTIVE_PLAYERS, values, COLUMN_GAME_ID + " = ?",
+                    new String[]{String.valueOf(game_id)});
+        }
+        else {
+            return 0;
+        }
+    }
+
+    public List<Player> getActivePlayers(long game_id) {
+//        List<long> player_id_list = new ArrayList<>();
+        List<Player> players = new ArrayList<>();
+
+        String query = "SELECT *"
+                + " FROM " + TABLE_ACTIVE_PLAYERS
+                + " WHERE " + COLUMN_GAME_ID + " = " + game_id;
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        long player_id;
+        Player player;
+        int index = 1;
+        if (cursor.moveToFirst()) {
+            do {
+                switch (index) {
+                    case 1:
+                        player_id = cursor.getLong(cursor.getColumnIndex(COLUMN_PLAYER1_ID));
+                        break;
+                    case 2:
+                        player_id = cursor.getLong(cursor.getColumnIndex(COLUMN_PLAYER2_ID));
+                        break;
+                    case 3:
+                        player_id = cursor.getLong(cursor.getColumnIndex(COLUMN_PLAYER3_ID));
+                        break;
+                    case 4:
+                        player_id = cursor.getLong(cursor.getColumnIndex(COLUMN_PLAYER4_ID));
+                        break;
+                    case 5:
+                        player_id = cursor.getLong(cursor.getColumnIndex(COLUMN_PLAYER5_ID));
+                        break;
+                    default:
+                        player_id = 0;
+                        break;
+                }
+                index++;
+                if (player_id > 0) {
+                    player = getPlayer(player_id);
+                    if (player.getId() > 0) {
+                        players.add(getPlayer(player_id));
+                    }
+                }
+            } while (player_id > 0);
+        }
+
+        return players;
+    }
+
+    boolean activePlayerExistsForGame(long game_id)
+    {
+        String query = "SELECT *"
+                + " FROM " + TABLE_ACTIVE_PLAYERS
+                + " WHERE " + COLUMN_GAME_ID + " = " + game_id;
+
+        Log.e(LOG, query);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst())
+            return true;
+        else
+            return false;
+    }
+
+    //endregion ACTIVE_PLAYERS METHODS
 }

@@ -2,6 +2,7 @@ package com.example.justi_000.statbasket;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,24 +39,16 @@ public class EditTeamActivity extends AppCompatActivity implements View.OnClickL
     {
         super.onStart();
         bundle = getIntent().getExtras();
-        if(bundle != null) {
+        if (bundle != null) {
             team = myDatabase.getTeam(bundle.getLong("team_id", 0));
         }
-//        Team team = new Team(bundle.getLong("team_id"), bundle.getString("team_name"));
-//        Team team = myDatabase.getTeam(bundle.getLong("team_id", -1));
-//        if (team == null)
-//        {
-//            team = myDatabase.getTeam(bundle.getLong("team_id", -1));
-//        }
-//        else if (team.getId() <= 0)
-//        {
-//            team = myDatabase.getTeam(bundle.getLong("team_id", -1));
-//        }
+
         if (team.getId() > 0)
         {
             setTitle(team.getName());
             players = myDatabase.getAllPlayers(team.getId());
         }
+
         player_names = new ArrayList<>();
         for(Player player : players)
         {
@@ -79,13 +72,12 @@ public class EditTeamActivity extends AppCompatActivity implements View.OnClickL
         });
     }
 
-    @Override
-    public void onClick(View v)
-    {
-    }
-
     public boolean onCreateOptionsMenu(Menu menu)
     {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(false);
+        }
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.edit_team_menu, menu);
         return true;
@@ -107,5 +99,10 @@ public class EditTeamActivity extends AppCompatActivity implements View.OnClickL
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onClick(View v)
+    {
     }
 }

@@ -22,6 +22,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import junit.framework.Assert;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,18 +113,33 @@ public class ViewGameActivity extends AppCompatActivity implements AdapterView.O
                     {
                         Team homeTeam = myDatabase.getTeamFromName(spinHomeTeam.getSelectedItem().toString());
                         Team awayTeam = myDatabase.getTeamFromName(spinAwayTeam.getSelectedItem().toString());
-                        Game newGame = new Game(homeTeam.getId(), awayTeam.getId(), editLocation.getText().toString());
-                        long success = myDatabase.createGame(newGame);
-                        if (success > 0) {
-                            Toast.makeText(ViewGameActivity.this, "Game Started", Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(ViewGameActivity.this, GameActivity.class);
+                        if (game.getGameId() > 0) {
+                            game.setHomeTeamId(homeTeam.getId());
+                            game.setAwayTeamId(awayTeam.getId());
+                            game.setLocation(editLocation.getText().toString());
+                            myDatabase.updateGame(game);
+                            Intent intent = new Intent(ViewGameActivity.this, StartingFiveActivity.class);
                             bundle.putLong("game_id", game.getGameId());
                             bundle.putLong("team_id", team.getId());
                             intent.putExtras(bundle);
                             startActivity(intent);
                         }
                         else {
-                            Toast.makeText(ViewGameActivity.this, "Starting Game Failed", Toast.LENGTH_LONG).show();
+                            Game newGame = new Game(homeTeam.getId(), awayTeam.getId(), editLocation.getText().toString());
+                            long new_game_id = myDatabase.createGame(newGame);
+                            if (new_game_id > 0)
+                            {
+                                //set game to new created game
+                                game = myDatabase.getGame(new_game_id);
+                                Intent intent = new Intent(ViewGameActivity.this, StartingFiveActivity.class);
+                                bundle.putLong("game_id", game.getGameId());
+                                bundle.putLong("team_id", team.getId());
+                                intent.putExtras(bundle);
+                                startActivity(intent);
+                            }
+                            else {
+                                Toast.makeText(ViewGameActivity.this, "Starting Game Failed", Toast.LENGTH_LONG).show();
+                            }
                         }
                     }
                 }

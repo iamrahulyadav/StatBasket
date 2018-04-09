@@ -96,33 +96,6 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
         deletePlayer();
     }
 
-//    @Override
-//    protected void onStart()
-//    {
-//        super.onStart();
-//        btnAdd.setOnClickListener(
-//                new View.OnClickListener()
-//                {
-//                    @Override
-//                    public  void onClick(View v)
-//                    {
-//                        Team team = new Team(editTeamName.getText().toString());
-//                        if (team.getName().length() != 0)
-//                        {
-//                            long success = myDatabase.createPlayer(team);
-//                            if (success > 0) {
-//                                Toast.makeText(ViewPlayerActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
-//                                Intent intent = new Intent(ViewPlayerActivity.this, MainActivity.class);
-//                                startActivity(intent);
-//                            }
-//                            else {
-//                                Toast.makeText(ViewPlayerActivity.this, "Data Insertion Failed", Toast.LENGTH_LONG).show();
-//                            }
-//                        }
-//                    }
-//                });
-//    }
-
     @Override
     public void onClick(View view)
     {
@@ -144,12 +117,10 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
                         {
                             long success = myDatabase.createPlayer(player, team.getId());
                             if (success > 0) {
-                                Toast.makeText(ViewPlayerActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
-//                                Intent intent = new Intent(ViewPlayerActivity.this, ViewTeamActivity.class);
-//                                startActivity(intent);
+                                Toast.makeText(ViewPlayerActivity.this, player.getFirstName() + " " + player.getLastName() + " Added", Toast.LENGTH_LONG).show();
                             }
                             else {
-                                Toast.makeText(ViewPlayerActivity.this, "Data Insertion Failed", Toast.LENGTH_LONG).show();
+                                Toast.makeText(ViewPlayerActivity.this, "Failed To Add Player", Toast.LENGTH_LONG).show();
                             }
                         }
                     }
@@ -165,7 +136,7 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
                         List<Player> players = myDatabase.getAllPlayers(team.getId());
                         if (players.size() == 0)
                         {
-                            showMessage("Error", "No Data Found");
+                            showMessage("Players", "No Players Found");
                             return;
                         }
                         StringBuffer buffer = new StringBuffer();
@@ -180,7 +151,7 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
                             buffer.append("Player Height (Inches): " + String.valueOf(player.getHeightInches()) + "\n\n");
                         }
 
-                        showMessage("Data", buffer.toString());
+                        showMessage("Players", buffer.toString());
                     }
                 }
         );
@@ -193,7 +164,6 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
                     @Override
                     public void onClick(View v)
                     {
-//                        Player player = myDatabase.getPlayer(tvIdValue.getText().toString());
                         player.setFirstName(editFirstName.getText().toString());
                         player.setLastName(editLastName.getText().toString());
                         player.setNumber(Integer.valueOf(editNumber.getText().toString()));
@@ -238,7 +208,7 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
     {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(false); // Remove the left caret
+            actionBar.setDisplayHomeAsUpEnabled(false);
         }
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.edit_team_menu, menu);
@@ -253,8 +223,9 @@ public class ViewPlayerActivity extends AppCompatActivity implements View.OnClic
                 startActivity(new Intent(this, MainActivity.class));
                 return true;
             case R.id.add_player:
-                Intent i = new Intent(ViewPlayerActivity.this, ViewGameActivity.class);
-                bundle.putString("team_id", "");
+                Intent i = new Intent(ViewPlayerActivity.this, ViewPlayerActivity.class);
+                bundle.putLong("team_id", team.getId());
+                bundle.putLong("player_id", 0);
                 i.putExtras(bundle);
                 startActivity(i);
                 return true;

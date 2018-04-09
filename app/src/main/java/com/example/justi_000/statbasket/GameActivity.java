@@ -1,22 +1,18 @@
 package com.example.justi_000.statbasket;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +26,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     Game game;
     ArrayList<String> gameLog = new ArrayList<>();
     ArrayAdapter<String> arrayAdapter;
+    List<Player> active_players = new ArrayList<>();
 
     Button btnOneMake;
     Button btnOneMiss;
@@ -65,7 +62,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         btnAssist = findViewById(R.id.btn_asst);
         btnBlock = findViewById(R.id.btn_blk);
         lvGameLog = findViewById(R.id.lv_game_log);
-        btnSub = findViewById(R.id.btn_sub);
+        btnSub = findViewById(R.id.btn_cancel);
 
         myDatabase = new DbHelper(this);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, gameLog);
@@ -97,14 +94,24 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             game = myDatabase.getGame(bundle.getLong("game_id", 0));
         }
 
-        Team homeTeam = myDatabase.getTeam(game.getHomeTeamId());
-        Team awayTeam = myDatabase.getTeam(game.getAwayTeamId());
-        String game_name = "";
-        if (homeTeam.getName().length() > 0)
-            game_name += homeTeam.getName();
-        if (awayTeam.getName().length() > 0)
-            game_name = game_name + " vs. " + awayTeam.getName();
-        setTitle(game_name);
+        if (game.getGameId() > 0) {
+            active_players = myDatabase.getActivePlayers(game.getGameId());
+        }
+
+        try {
+            Team homeTeam = myDatabase.getTeam(game.getHomeTeamId());
+            Team awayTeam = myDatabase.getTeam(game.getAwayTeamId());
+            String game_name = "";
+            if (homeTeam.getName().length() > 0)
+                game_name += homeTeam.getName();
+            if (awayTeam.getName().length() > 0)
+                game_name = game_name + " vs. " + awayTeam.getName();
+            setTitle(game_name);
+        }
+        catch(Exception e)
+        {
+            Log.e("Error Getting Teams", "Getting Home and Away teams failed");
+        }
     }
 
     public void addOne()
@@ -317,11 +324,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        public void addItems(View v)
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...sub");
-                        arrayAdapter.notifyDataSetChanged();
+//                        gameLog.add(0, "...sub");
+//                        arrayAdapter.notifyDataSetChanged();
+                        Intent intent = new Intent(GameActivity.this, SubPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        intent.putExtras(bundle);
+                        startActivity(intent);
                     }
                 }
         );

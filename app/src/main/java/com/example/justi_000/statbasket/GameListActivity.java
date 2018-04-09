@@ -43,23 +43,13 @@ public class GameListActivity extends AppCompatActivity implements View.OnClickL
         if(bundle != null) {
             team = myDatabase.getTeam(bundle.getLong("team_id", 0));
         }
-//        Team team = new Team(bundle.getLong("team_id"), bundle.getString("team_name"));
-//        Team team = myDatabase.getTeam(bundle.getLong("team_id", -1));
-//        if (team == null)
-//        {
-//            team = myDatabase.getTeam(bundle.getLong("team_id", -1));
-//        }
-//        else if (team.getId() <= 0)
-//        {
-//            team = myDatabase.getTeam(bundle.getLong("team_id", -1));
-//        }
+
         if (team.getId() > 0)
         {
             setTitle(team.getName());
-//            Game tempGame = new Game(1,2,"KC");
-//            long game_id = myDatabase.createGame(tempGame);
             games = myDatabase.getAllGames(team.getId());
         }
+
         game_names = new ArrayList<>();
         for(Game game : games)
         {
@@ -84,7 +74,7 @@ public class GameListActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                Intent i = new Intent(GameListActivity.this, GameActivity.class);
+                Intent i = new Intent(GameListActivity.this, ViewGameActivity.class);
                 bundle.putLong("game_id", games.get(position).getGameId());
                 bundle.putLong("team_id", team.getId());
                 i.putExtras(bundle);
@@ -102,9 +92,7 @@ public class GameListActivity extends AppCompatActivity implements View.OnClickL
     {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-//            actionBar.setHomeButtonEnabled(false);      // Disable the button
             actionBar.setDisplayHomeAsUpEnabled(false);
-//            actionBar.setDisplayShowHomeEnabled(false); // Remove the icon
         }
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.game_menu, menu);

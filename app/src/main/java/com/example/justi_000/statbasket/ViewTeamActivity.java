@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -94,12 +97,12 @@ public class ViewTeamActivity extends AppCompatActivity implements View.OnClickL
                             //success holds the team id of the created team
                             long success = myDatabase.createTeam(team);
                             if (success > 0) {
-                                Toast.makeText(ViewTeamActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
+                                Toast.makeText(ViewTeamActivity.this, team.getName() + " Added", Toast.LENGTH_LONG).show();
                                 Intent intent = new Intent(ViewTeamActivity.this, MainActivity.class);
                                 startActivity(intent);
                             }
                             else {
-                                Toast.makeText(ViewTeamActivity.this, "Data Insertion Failed", Toast.LENGTH_LONG).show();
+                                Toast.makeText(ViewTeamActivity.this, "Failed To Add Team", Toast.LENGTH_LONG).show();
                             }
                         }
                     }
@@ -137,7 +140,7 @@ public class ViewTeamActivity extends AppCompatActivity implements View.OnClickL
                         List<Team> teams = myDatabase.getAllTeams();
                         if (teams.size() == 0)
                         {
-                            showMessage("Error", "No Data Found");
+                            showMessage("Teams", "No Teams Found");
                             return;
                         }
                         StringBuffer buffer = new StringBuffer();
@@ -147,7 +150,7 @@ public class ViewTeamActivity extends AppCompatActivity implements View.OnClickL
                             buffer.append("Team Name: " + team.getName() + "\n\n");
                         }
 
-                        showMessage("Data", buffer.toString());
+                        showMessage("Teams", buffer.toString());
                     }
                 }
         );
@@ -247,31 +250,28 @@ public class ViewTeamActivity extends AppCompatActivity implements View.OnClickL
         builder.show();
     }
 
-//    public boolean onCreateOptionsMenu(Menu menu)
-//    {
-//        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.edit_team_menu, menu);
-//        return true;
-//    }
-//
-//    public boolean onOptionsItemSelected(MenuItem item)
-//    {
-//        switch (item.getItemId())
-//        {
-//            case R.id.add:
-//                addTeam();
-//                return true;
-//            case R.id.update:
-//                updateTeam();
-//                return true;
-//            case R.id.delete:
-//                deleteTeam();
-//                return true;
-//            case R.id.view_all:
-//                viewAllTeams();
-//                return true;
-//            default:
-//                return super.onOptionsItemSelected(item);
-//        }
-//    }
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.home:
+                startActivity(new Intent(ViewTeamActivity.this, MainActivity.class));
+                return true;
+            case R.id.add_team:
+                Intent i = new Intent(ViewTeamActivity.this, ViewTeamActivity.class);
+                bundle.putLong("team_id", -1);
+                i.putExtras(bundle);
+                startActivity(i);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }
