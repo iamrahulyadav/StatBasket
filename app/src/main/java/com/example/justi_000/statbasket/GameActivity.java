@@ -1,6 +1,9 @@
 package com.example.justi_000.statbasket;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -24,9 +27,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     Bundle bundle = new Bundle();
     Team team;
     Game game;
+    Player currentPlayer;
+    String currentStat;
     ArrayList<String> gameLog = new ArrayList<>();
     ArrayAdapter<String> arrayAdapter;
-    List<Player> active_players = new ArrayList<>();
+//    List<Player> active_players = new ArrayList<>();
 
     Button btnOneMake;
     Button btnOneMiss;
@@ -40,6 +45,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     Button btnSteal;
     Button btnAssist;
     Button btnBlock;
+    Button btnFoul;
     ListView lvGameLog;
     Button btnSub;
 
@@ -63,6 +69,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         btnBlock = findViewById(R.id.btn_blk);
         lvGameLog = findViewById(R.id.lv_game_log);
         btnSub = findViewById(R.id.btn_cancel);
+        btnFoul = findViewById(R.id.btn_foul);
 
         myDatabase = new DbHelper(this);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, gameLog);
@@ -80,6 +87,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         addSteal();
         addTurnover();
         addBlock();
+        addFoul();
         subPlayers();
     }
 
@@ -92,25 +100,91 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         if(bundle != null) {
             team = myDatabase.getTeam(bundle.getLong("team_id", 0));
             game = myDatabase.getGame(bundle.getLong("game_id", 0));
+            currentPlayer = myDatabase.getPlayer(bundle.getLong("player_id", 0));
+            currentStat = bundle.getString("stat", "");
         }
 
-        if (game.getGameId() > 0) {
-            active_players = myDatabase.getActivePlayers(game.getGameId());
-        }
+        Team homeTeam = myDatabase.getTeam(game.getHomeTeamId());
+        Team awayTeam = myDatabase.getTeam(game.getAwayTeamId());
+        String game_name = "";
+        if (homeTeam.getName().length() > 0)
+            game_name += homeTeam.getName();
+        if (awayTeam.getName().length() > 0)
+            game_name = game_name + " vs. " + awayTeam.getName();
+        setTitle(game_name);
+    }
 
-        try {
-            Team homeTeam = myDatabase.getTeam(game.getHomeTeamId());
-            Team awayTeam = myDatabase.getTeam(game.getAwayTeamId());
-            String game_name = "";
-            if (homeTeam.getName().length() > 0)
-                game_name += homeTeam.getName();
-            if (awayTeam.getName().length() > 0)
-                game_name = game_name + " vs. " + awayTeam.getName();
-            setTitle(game_name);
-        }
-        catch(Exception e)
-        {
-            Log.e("Error Getting Teams", "Getting Home and Away teams failed");
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        bundle = data.getExtras();
+        currentStat = bundle.getString("stat", "");
+        currentPlayer = myDatabase.getPlayer(bundle.getLong("player_id", 0));
+        if (currentPlayer.getId() > 0) {
+            if (requestCode == 1) {
+                if (resultCode == Activity.RESULT_OK) {
+                    switch (currentStat) {
+                        case "made_one":
+                            gameLog.add(0, "1PT - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        case "missed_one":
+                            gameLog.add(0, "1PT Miss - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        case "made_two":
+                            gameLog.add(0, "2PT - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        case "missed_two":
+                            gameLog.add(0, "2PT Miss - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        case "made_three":
+                            gameLog.add(0, "3PT - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        case "missed_three":
+                            gameLog.add(0, "3PT Miss - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        case "off_reb":
+                            gameLog.add(0, "Off Reb - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        case "def_reb":
+                            gameLog.add(0, "Def Reb - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        case "steal":
+                            gameLog.add(0, "Steal - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        case "assist":
+                            gameLog.add(0, "Assist - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        case "block":
+                            gameLog.add(0, "Block - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        case "turnover":
+                            gameLog.add(0, "Turnover - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        case "foul":
+                            gameLog.add(0, "Foul - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                            arrayAdapter.notifyDataSetChanged();
+                            break;
+                        default:
+                            gameLog.add(0, "SOMETHING FUNKY HAPPENED");
+                            break;
+                    }
+                }
+                if (resultCode == Activity.RESULT_CANCELED) {
+                    gameLog.add(0, "...cancelled");
+                    arrayAdapter.notifyDataSetChanged();
+                }
+            }
         }
     }
 
@@ -121,10 +195,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...made free throw");
-                        arrayAdapter.notifyDataSetChanged();
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "made_one");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
+
+//                        gameLog.add(0, "...made free throw");
+//                        arrayAdapter.notifyDataSetChanged();
                     }
                 }
         );
@@ -137,11 +216,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        public void addItems(View v)
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...missed free throw");
-                        arrayAdapter.notifyDataSetChanged();
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "missed_one");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
                     }
                 }
         );
@@ -154,11 +234,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        public void addItems(View v)
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...made 2pt");
-                        arrayAdapter.notifyDataSetChanged();
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "made_two");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
                     }
                 }
         );
@@ -171,11 +252,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        public void addItems(View v)
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...missed 2pt");
-                        arrayAdapter.notifyDataSetChanged();
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "missed_two");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
                     }
                 }
         );
@@ -188,11 +270,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        public void addItems(View v)
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...made 3pt");
-                        arrayAdapter.notifyDataSetChanged();
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "made_three");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
                     }
                 }
         );
@@ -205,11 +288,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        public void addItems(View v)
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...missed 3pt");
-                        arrayAdapter.notifyDataSetChanged();
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "missed_three");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
                     }
                 }
         );
@@ -222,11 +306,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        public void addItems(View v)
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...O-Reb");
-                        arrayAdapter.notifyDataSetChanged();
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "off_reb");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
                     }
                 }
         );
@@ -239,11 +324,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        public void addItems(View v)
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...D-Reb");
-                        arrayAdapter.notifyDataSetChanged();
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "def_reb");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
                     }
                 }
         );
@@ -256,11 +342,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        public void addItems(View v)
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...steal");
-                        arrayAdapter.notifyDataSetChanged();
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "steal");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
                     }
                 }
         );
@@ -273,11 +360,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        public void addItems(View v)
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...assist");
-                        arrayAdapter.notifyDataSetChanged();
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "assist");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
                     }
                 }
         );
@@ -290,11 +378,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        public void addItems(View v)
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...turnover");
-                        arrayAdapter.notifyDataSetChanged();
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "turnover");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
                     }
                 }
         );
@@ -307,11 +396,30 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        public void addItems(View v)
-//                        listItems.add("Clicked : "+clickCounter++);
-//                        adapter.notifyDataSetChanged();
-                        gameLog.add(0, "...block");
-                        arrayAdapter.notifyDataSetChanged();
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "block");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
+                    }
+                }
+        );
+    }
+
+    public void addFoul()
+    {
+        btnFoul.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        Intent i = new Intent(GameActivity.this, SelectPlayerActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        bundle.putString("stat", "foul");
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
                     }
                 }
         );
@@ -324,8 +432,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View v)
                     {
-//                        gameLog.add(0, "...sub");
-//                        arrayAdapter.notifyDataSetChanged();
                         Intent intent = new Intent(GameActivity.this, SubPlayerActivity.class);
                         bundle.putLong("game_id", game.getGameId());
                         bundle.putLong("team_id", team.getId());
@@ -356,7 +462,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 return true;
             case R.id.new_game:
                 Intent i = new Intent(GameActivity.this, ViewGameActivity.class);
-                bundle.putString("team_id", "");
+                bundle.putLong("team_id", team.getId());
                 i.putExtras(bundle);
                 startActivity(i);
                 return true;

@@ -75,6 +75,9 @@ public class ViewGameActivity extends AppCompatActivity implements AdapterView.O
             team = new Team();
             game = new Game();
         }
+        if (game.getGameId() > 0) {
+            btnStartGame.setText("Resume Game");
+        }
         setTitle("Create Game For: " + team.getName());
 
         teams = myDatabase.getAllTeams();
@@ -118,7 +121,7 @@ public class ViewGameActivity extends AppCompatActivity implements AdapterView.O
                             game.setAwayTeamId(awayTeam.getId());
                             game.setLocation(editLocation.getText().toString());
                             myDatabase.updateGame(game);
-                            Intent intent = new Intent(ViewGameActivity.this, StartingFiveActivity.class);
+                            Intent intent = new Intent(ViewGameActivity.this, GameActivity.class);
                             bundle.putLong("game_id", game.getGameId());
                             bundle.putLong("team_id", team.getId());
                             intent.putExtras(bundle);

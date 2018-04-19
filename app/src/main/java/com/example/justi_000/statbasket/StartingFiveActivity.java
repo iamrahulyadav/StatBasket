@@ -88,13 +88,15 @@ public class StartingFiveActivity extends AppCompatActivity implements View.OnCl
         {
             int position = benchPlayersArrayAdapter.getPosition(player.getFirstName() + " " + player.getLastName());
 
-            active_player_names.add(player_names.get(position));
+            if (position >= 0) {
+                active_player_names.add(player_names.get(position));
 
-            players.remove(position);
-            player_names.remove(position);
+                players.remove(position);
+                player_names.remove(position);
 
-            activePlayersArrayAdapter.notifyDataSetChanged();
-            benchPlayersArrayAdapter.notifyDataSetChanged();
+                activePlayersArrayAdapter.notifyDataSetChanged();
+                benchPlayersArrayAdapter.notifyDataSetChanged();
+            }
         }
 
         lvActivePlayers.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -142,9 +144,8 @@ public class StartingFiveActivity extends AppCompatActivity implements View.OnCl
                     {
                         if (game.getGameId() > 0)
                         {
-                            if (myDatabase.activePlayerExistsForGame(game.getGameId()) == true)
-                            {
-                                myDatabase.updateActivePlayers(game.getGameId(), active_players);
+                            long success = myDatabase.createActivePlayers(game.getGameId(), active_players);
+                            if (success > 0) {
                                 Intent intent = new Intent(StartingFiveActivity.this, GameActivity.class);
                                 bundle.putLong("team_id", team.getId());
                                 bundle.putLong("game_id", game.getGameId());
@@ -152,17 +153,7 @@ public class StartingFiveActivity extends AppCompatActivity implements View.OnCl
                                 startActivity(intent);
                             }
                             else {
-                                long success = myDatabase.createActivePlayers(game.getGameId(), active_players);
-                                if (success > 0) {
-                                    Intent intent = new Intent(StartingFiveActivity.this, GameActivity.class);
-                                    bundle.putLong("team_id", team.getId());
-                                    bundle.putLong("game_id", game.getGameId());
-                                    intent.putExtras(bundle);
-                                    startActivity(intent);
-                                }
-                                else {
-                                    Toast.makeText(StartingFiveActivity.this, "Starting Game Failed", Toast.LENGTH_LONG).show();
-                                }
+                                Toast.makeText(StartingFiveActivity.this, "Starting Game Failed", Toast.LENGTH_LONG).show();
                             }
                         }
                     }

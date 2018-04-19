@@ -91,13 +91,15 @@ public class SubPlayerActivity extends AppCompatActivity implements View.OnClick
         {
             int position = benchPlayersArrayAdapter.getPosition(player.getFirstName() + " " + player.getLastName());
 
-            active_player_names.add(player_names.get(position));
+            if (position >= 0) {
+                active_player_names.add(String.valueOf(benchPlayersArrayAdapter.getItem(position)));
 
-            players.remove(position);
-            player_names.remove(position);
+                players.remove(position);
+                player_names.remove(position);
 
-            activePlayersArrayAdapter.notifyDataSetChanged();
-            benchPlayersArrayAdapter.notifyDataSetChanged();
+                activePlayersArrayAdapter.notifyDataSetChanged();
+                benchPlayersArrayAdapter.notifyDataSetChanged();
+            }
         }
 
         lvActivePlayers.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -110,19 +112,9 @@ public class SubPlayerActivity extends AppCompatActivity implements View.OnClick
                 players.add(active_players.get(position));
                 player_names.add(active_player_names.get(position));
 
-                try {
-                    active_players.remove(position);
-                }
-                catch (IndexOutOfBoundsException e) {
-                    Log.e("Error Removing", "Removing from active_players failed");
-                }
+                active_players.remove(position);
+                active_player_names.remove(position);
 
-                try {
-                    active_player_names.remove(position);
-                }
-                catch (IndexOutOfBoundsException e) {
-                    Log.e("Error Removing", "Removing from active_player_names failed");
-                }
 
                 activePlayersArrayAdapter.notifyDataSetChanged();
                 benchPlayersArrayAdapter.notifyDataSetChanged();
@@ -139,19 +131,8 @@ public class SubPlayerActivity extends AppCompatActivity implements View.OnClick
                 active_players.add(players.get(position));
                 active_player_names.add(player_names.get(position));
 
-                try {
-                    players.remove(position);
-                }
-                catch (IndexOutOfBoundsException e) {
-                    Log.e("Error Removing", "Removing from players failed");
-                }
-
-                try {
-                    player_names.remove(position);
-                }
-                catch (IndexOutOfBoundsException e) {
-                    Log.e("Error Removing", "Removing from player_names failed");
-                }
+                players.remove(position);
+                player_names.remove(position);
 
                 activePlayersArrayAdapter.notifyDataSetChanged();
                 benchPlayersArrayAdapter.notifyDataSetChanged();
@@ -170,13 +151,8 @@ public class SubPlayerActivity extends AppCompatActivity implements View.OnClick
                         if (game.getGameId() > 0)
                         {
                             //add success check here for updating????
-                            try {
-                                myDatabase.updateActivePlayers(game.getGameId(), active_players);
-                            }
-                            catch (Exception e)
-                            {
-                                Log.e("Update Exception", "Updating active players failed");
-                            }
+//                            myDatabase.updateActivePlayers(game.getGameId(), active_players);
+                            myDatabase.createActivePlayers(game.getGameId(), active_players);
                             Intent intent = new Intent(SubPlayerActivity.this, GameActivity.class);
                             bundle.putLong("team_id", team.getId());
                             bundle.putLong("game_id", game.getGameId());
