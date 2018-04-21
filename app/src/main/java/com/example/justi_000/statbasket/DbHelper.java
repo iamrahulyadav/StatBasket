@@ -23,7 +23,7 @@ public class DbHelper extends SQLiteOpenHelper
     // Logcat tag
     private static final String LOG = "DBHelper";
     // Database Version
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 14;
     // Database Name
     private static final String DATABASE_NAME = "StatBasket";
 
@@ -37,7 +37,8 @@ public class DbHelper extends SQLiteOpenHelper
     private static final String TABLE_PLAYER_TEAM = "player_team";
     private static final String TABLE_GAME = "game";
     private static final String TABLE_ACTIVE_PLAYERS = "active_players";
-    private static final String TABLE_PLAYER_STATS = "player_stats";
+    private static final String TABLE_STAT_TYPE = "stat_type";
+    private static final String TABLE_STATS = "stats";
 
     //endregion TABLE NAMES
 
@@ -68,21 +69,13 @@ public class DbHelper extends SQLiteOpenHelper
     private static final String COLUMN_AWAY_TEAM_ID = "away_team_id";
     private static final String COLUMN_LOCATION = "location";
 
-    // GAME STATS COLUMNS
-    private static final String COLUMN_MADE_FT = "free_throws_made";
-    private static final String COLUMN_MISSED_FT = "free_throws_missed";
-    private static final String COLUMN_MADE_TWOS = "twos_made";
-    private static final String COLUMN_MISSED_TWOS = "twos_missed";
-    private static final String COLUMN_MADE_THREES = "threes_made";
-    private static final String COLUMN_MISSED_THREES = "threes_missed";
-    private static final String COLUMN_DEF_REBS = "defensive_rebounds";
-    private static final String COLUMN_OFF_REBS = "offensive_rebounds";
-    private static final String COLUMN_ASSISTS = "assists";
-    private static final String COLUMN_STEALS = "steals";
-    private static final String COLUMN_TURNOVERS = "turnovers";
-    private static final String COLUMN_BLOCKS = "blocks";
-    private static final String COLUMN_FOULS = "fouls";
+    // STAT_TYPE COLUMNS
+    private static final String COLUMN_STAT_TYPE_ID = "stat_type_id";
+    private static final String COLUMN_TYPE_NAME = "type_name";
 
+    // STATS COLUMNS
+    private static final String COLUMN_STATS_ID = "stats_id";
+    private static final String COLUMN_VALUE = "value";
 
     //endregion TABLE COLUMN NAMES
 
@@ -125,24 +118,18 @@ public class DbHelper extends SQLiteOpenHelper
             + COLUMN_GAME_ID + " INTEGER,"
             + COLUMN_PLAYER_ID + " INTEGER)";
 
-    // PLAYER_STATS table create statement
-    private static final String CREATE_TABLE_PLAYER_STATS = "CREATE TABLE " + TABLE_PLAYER_STATS + "("
-            + COLUMN_GAME_ID        + " INTEGER NOT NULL,"
-            + COLUMN_PLAYER_ID      + " INTEGER NOT NULL,"
-            + COLUMN_MADE_FT        + " INTEGER,"
-            + COLUMN_MISSED_FT      + " INTEGER,"
-            + COLUMN_MADE_TWOS      + " INTEGER,"
-            + COLUMN_MISSED_TWOS    + " INTEGER,"
-            + COLUMN_MADE_THREES    + " INTEGER,"
-            + COLUMN_MISSED_THREES  + " INTEGER,"
-            + COLUMN_DEF_REBS       + " INTEGER,"
-            + COLUMN_OFF_REBS       + " INTEGER,"
-            + COLUMN_ASSISTS        + " INTEGER,"
-            + COLUMN_STEALS         + " INTEGER,"
-            + COLUMN_TURNOVERS      + " INTEGER,"
-            + COLUMN_BLOCKS         + " INTEGER,"
-            + COLUMN_FOULS          + " INTEGER,"
-            + " CONSTRAINT pk_player_game PRIMARY KEY (" + COLUMN_GAME_ID + ", " + COLUMN_PLAYER_ID + "))";
+    // STAT_TYPE table create statement
+    private static final String CREATE_TABLE_STAT_TYPE = "CREATE TABLE " + TABLE_STAT_TYPE + "("
+            + COLUMN_STAT_TYPE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_TYPE_NAME + " TEXT)";
+
+    // STATS table create statement
+    private static final String CREATE_TABLE_STATS = "CREATE TABLE " + TABLE_STATS + "("
+            + COLUMN_STATS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_PLAYER_ID + " INTEGER,"
+            + COLUMN_GAME_ID + " INTEGER,"
+            + COLUMN_STAT_TYPE_ID + " INTEGER,"
+            + COLUMN_VALUE + " INTEGER)";
 
     //endregion CREATE TABLE STATEMENTS
 
@@ -162,7 +149,23 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL(CREATE_TABLE_PLAYER_TEAM);
         db.execSQL(CREATE_TABLE_GAME);
         db.execSQL(CREATE_TABLE_ACTIVE_PLAYERS);
-        db.execSQL(CREATE_TABLE_PLAYER_STATS);
+        db.execSQL(CREATE_TABLE_STAT_TYPE);
+        db.execSQL(CREATE_TABLE_STATS);
+
+        //insert STAT TYPES into TABLE_STAT_TYPE
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('made_one')");
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('missed_one')");
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('made_two')");
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('missed_two')");
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('made_three')");
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('missed_three')");
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('def_reb')");
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('off_reb')");
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('assist')");
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('steal')");
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('turnover')");
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('block')");
+        db.execSQL("INSERT INTO " + TABLE_STAT_TYPE + " (" +  COLUMN_TYPE_NAME + ") VALUES ('foul')");
     }
 
     @Override
@@ -173,7 +176,8 @@ public class DbHelper extends SQLiteOpenHelper
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYER_TEAM);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_GAME);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIVE_PLAYERS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYER_STATS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_STAT_TYPE);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_STATS);
 
         // create new tables
         onCreate(db);
@@ -195,7 +199,6 @@ public class DbHelper extends SQLiteOpenHelper
         values.put(COLUMN_HEIGHT_INCHES, player.getHeightInches());
         values.put(COLUMN_CREATED_DATE, getCurrentDateTime());
 
-        // insert row
         long player_id = db.insert(TABLE_PLAYER, null, values);
 
         // assign a team to player
@@ -575,4 +578,48 @@ public class DbHelper extends SQLiteOpenHelper
 //    }
 
     //endregion ACTIVE_PLAYERS METHODS
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //region STATS METHODS
+
+    public long insertStat(long player_id, long game_id, long stat_type_id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PLAYER_ID, player_id);
+        values.put(COLUMN_GAME_ID, game_id);
+        values.put(COLUMN_STAT_TYPE_ID, stat_type_id);
+        values.put(COLUMN_VALUE, 1);
+
+        long stats_id = db.insert(TABLE_STATS, null, values);
+
+        return stats_id;
+    }
+
+    public long insertStat(long player_id, long game_id, String stat_type) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        String query = "SELECT  * FROM " + TABLE_STAT_TYPE + " WHERE "
+                + COLUMN_TYPE_NAME + " = '" + stat_type + "'";
+
+        Log.e(LOG, query);
+
+        Cursor cursor = db.rawQuery(query, null);
+        long stat_type_id;
+
+        if (cursor.moveToFirst()) {
+            stat_type_id = cursor.getInt(cursor.getColumnIndex(COLUMN_STAT_TYPE_ID));
+            values.put(COLUMN_PLAYER_ID, player_id);
+            values.put(COLUMN_GAME_ID, game_id);
+            values.put(COLUMN_STAT_TYPE_ID, stat_type_id);
+            values.put(COLUMN_VALUE, 1);
+        }
+
+        long stats_id = db.insert(TABLE_STATS, null, values);
+
+        return stats_id;
+    }
+
+    //endregion
 }

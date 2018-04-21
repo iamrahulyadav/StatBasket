@@ -119,61 +119,102 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         bundle = data.getExtras();
         currentStat = bundle.getString("stat", "");
         currentPlayer = myDatabase.getPlayer(bundle.getLong("player_id", 0));
+        long success;
         if (currentPlayer.getId() > 0) {
             if (requestCode == 1) {
                 if (resultCode == Activity.RESULT_OK) {
                     switch (currentStat) {
                         case "made_one":
-                            gameLog.add(0, "1PT - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
+                            if (success > 0){
+                                gameLog.add(0, "1PT - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
                             break;
                         case "missed_one":
-                            gameLog.add(0, "1PT Miss - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(),
+                                    );
+                            if (success > 0) {
+                                gameLog.add(0, "1PT Miss - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
                             break;
                         case "made_two":
-                            gameLog.add(0, "2PT - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
+                            if (success > 0) {
+                                gameLog.add(0, "2PT - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
                             break;
                         case "missed_two":
-                            gameLog.add(0, "2PT Miss - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
+                            if (success > 0) {
+                                gameLog.add(0, "2PT Miss - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
                             break;
                         case "made_three":
-                            gameLog.add(0, "3PT - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
+                            if (success > 0) {
+                                gameLog.add(0, "3PT - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
                             break;
                         case "missed_three":
-                            gameLog.add(0, "3PT Miss - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
-                            break;
-                        case "off_reb":
-                            gameLog.add(0, "Off Reb - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
+                            if (success > 0) {
+                                gameLog.add(0, "3PT Miss - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
                             break;
                         case "def_reb":
-                            gameLog.add(0, "Def Reb - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
+                            if (success > 0) {
+                                gameLog.add(0, "Def Reb - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
                             break;
-                        case "steal":
-                            gameLog.add(0, "Steal - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
+                        case "off_reb":
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
+                            if (success > 0) {
+                                gameLog.add(0, "Off Reb - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
                             break;
                         case "assist":
-                            gameLog.add(0, "Assist - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
+                            if (success > 0) {
+                                gameLog.add(0, "Assist - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
                             break;
-                        case "block":
-                            gameLog.add(0, "Block - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
+                        case "steal":
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
+                            if (success > 0) {
+                                gameLog.add(0, "Steal - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
                             break;
                         case "turnover":
-                            gameLog.add(0, "Turnover - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
+                            if (success > 0) {
+                                gameLog.add(0, "Turnover - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
+                            break;
+                        case "block":
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
+                            if (success > 0) {
+                                gameLog.add(0, "Block - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
                             break;
                         case "foul":
-                            gameLog.add(0, "Foul - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
-                            arrayAdapter.notifyDataSetChanged();
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
+                            if (success > 0) {
+                                gameLog.add(0, "Foul - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
+                                arrayAdapter.notifyDataSetChanged();
+                            }
                             break;
                         default:
                             gameLog.add(0, "SOMETHING FUNKY HAPPENED");
