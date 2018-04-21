@@ -132,8 +132,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             }
                             break;
                         case "missed_one":
-                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(),
-                                    );
+                            success = myDatabase.insertStat(game.getGameId(), currentPlayer.getId(), currentStat);
                             if (success > 0) {
                                 gameLog.add(0, "1PT Miss - " + currentPlayer.getLastName() + " #" + currentPlayer.getNumber());
                                 arrayAdapter.notifyDataSetChanged();
