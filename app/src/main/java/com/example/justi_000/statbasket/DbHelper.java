@@ -23,7 +23,7 @@ public class DbHelper extends SQLiteOpenHelper
     // Logcat tag
     private static final String LOG = "DBHelper";
     // Database Version
-    private static final int DATABASE_VERSION = 14;
+    private static final int DATABASE_VERSION = 15;
     // Database Name
     private static final String DATABASE_NAME = "StatBasket";
 
@@ -619,6 +619,48 @@ public class DbHelper extends SQLiteOpenHelper
         long stats_id = db.insert(TABLE_STATS, null, values);
 
         return stats_id;
+    }
+
+    public long getStat(long player_id, long game_id, String stat_type) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        String query = "SELECT * FROM " + TABLE_STAT_TYPE + " WHERE "
+                + COLUMN_TYPE_NAME + " = '" + stat_type + "'";
+
+        Log.e(LOG, query);
+
+        Cursor cursor = db.rawQuery(query, null);
+        long stat_type_id;
+
+        if (cursor.moveToFirst()) {
+            stat_type_id = cursor.getInt(cursor.getColumnIndex(COLUMN_STAT_TYPE_ID));
+        }
+        else {
+            return 0;
+        }
+
+//        query = "SELECT COUNT(" + COLUMN_STATS_ID + ") FROM " + TABLE_STATS + " WHERE "
+//                + COLUMN_PLAYER_ID + " = " + player_id + " AND "
+//                + COLUMN_GAME_ID + " = " + game_id + " AND "
+//                + COLUMN_STAT_TYPE_ID + " = " + stat_type_id;
+
+        query = "SELECT * FROM " + TABLE_STATS + " WHERE "
+                + COLUMN_PLAYER_ID + " = " + player_id + " AND "
+                + COLUMN_GAME_ID + " = " + game_id + " AND "
+                + COLUMN_STAT_TYPE_ID + " = " + stat_type_id;
+
+        Log.e(LOG, query);
+
+        cursor = db.rawQuery(query, null);
+        long numRows = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                numRows++;
+            } while (cursor.moveToNext());
+        }
+
+        return numRows;
     }
 
     //endregion

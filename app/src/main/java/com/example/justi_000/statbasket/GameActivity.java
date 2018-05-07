@@ -48,6 +48,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     Button btnFoul;
     ListView lvGameLog;
     Button btnSub;
+    Button btnViewStats;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -70,6 +71,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         lvGameLog = findViewById(R.id.lv_game_log);
         btnSub = findViewById(R.id.btn_cancel);
         btnFoul = findViewById(R.id.btn_foul);
+        btnViewStats = findViewById(R.id.btn_view_stats);
 
         myDatabase = new DbHelper(this);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, gameLog);
@@ -89,6 +91,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         addBlock();
         addFoul();
         subPlayers();
+        viewStats();
     }
 
     @Override
@@ -226,6 +229,23 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         }
+    }
+
+    public void viewStats()
+    {
+        btnViewStats.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        Intent i = new Intent(GameActivity.this, ViewStatsActivity.class);
+                        bundle.putLong("game_id", game.getGameId());
+                        bundle.putLong("team_id", team.getId());
+                        i.putExtras(bundle);
+                        startActivityForResult(i, 1);
+                    }
+                }
+        );
     }
 
     public void addOne()
@@ -486,7 +506,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(false); // Remove the left caret
+            actionBar.setDisplayHomeAsUpEnabled(false);
         }
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.game_menu, menu);
